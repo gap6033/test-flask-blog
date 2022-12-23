@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+
+{% block content %}
+  {% for post in posts.items %}
+    <article class="media content-section">
+      <!-- adding profile image of the user to each post, we acces it through the post table backrefrencing through author and reaching the image element -->
+      <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pictures/' + post.author.image_file) }}">
+      <div class="media-body">
+        <div class="article-metadata">
+          <!-- accessing just the username element through backref post.author will return all the three fields as defined through __repr__method -->
+          <a class="mr-2" href="{{ url_for('user', user_id=post.user_id) }}">{{ post.author.username }}</a>
+        </div>
+
+        <!-- giving url to the post title through post route as defined in routes.py, url of the post followed by post.id -->
+        <h2><a class="article-title" href="{{ url_for('post', post_id=post.id) }}"">{{ post.title }}</a></h2>
+
+        <div class ="container">
+          <div class="row">
+             <!-- we add strftime('%Y-%m-%d' as we only want year month and date -->
+            <div class="col style="text-align:left;"><small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small></div>
+            <div class="col" style="text-align:right;"><small class="text-muted">{{ post.date_posted.strftime('%H: %M: %S') }}</small></div>
+          </div>
+        </div>
+
+        <hr>
+        <p class="article-content">{{ post.content }}</p><br>
+      </div>
+    </article>
+  {% endfor %}
+  {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+    {% if page_num %}
+      {% if posts.page == page_num %}
+        <a class="btn btn-info mb-4" href="#">{{ page_num }}</a>
+      {% else %}
+        <a class="btn btn-outline-info mb-4" href="{{ url_for('user', user_id=user.id, page=page_num) }}">{{ page_num }}</a>
+      {% endif %}
+    {% else %}
+      ...
+    {% endif %}
+  {% endfor %}
+{% endblock %}

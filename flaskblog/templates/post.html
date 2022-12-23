@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+
+{% block content %}
+  <article class="media content-section">
+    <!-- adding profile image of the user to each post, we acces it through the post table backrefrencing through author and reaching the image element -->
+    <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pictures/' + post.author.image_file) }}">
+    <div class="media-body">
+      <div class="article-metadata">
+        <!-- accessing just the username element through backref post.author will return all the three fields as defined through __repr__method -->
+        <a class="mr-2" href="{{ url_for('user', user_id = post.user_id) }}">{{ post.author.username }}</a>
+        <!-- we add strftime('%Y-%m-%d' as we only want year month and date and not the time -->
+
+        {% if post.author == current_user %}
+          <div>
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" id="update_post" href="{{ url_for ('update_post', post_id=post.id) }}">Update</a>
+            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete Post?</button>
+          </div>
+        {% endif %}
+      </div>
+      <h2>{{ post.title }}</h2>
+      <div class ="container">
+        <div class="row">
+           <!-- we add strftime('%Y-%m-%d' as we only want year month and date -->
+          <div class="col style="text-align:left;"><small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small></div>
+          <div class="col" style="text-align:right;"><small class="text-muted">{{ post.date_posted.strftime('%H: %M: %S') }}</small></div>
+        </div>
+      </div>
+      <hr>
+      <p class="article-content">{{ post.content }}</p>
+    </div>
+  </article>
+  <!-- A pop-up before deleting a post -->
+  <!-- Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete Post</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Post once delete cannot be recovered. Are you sure you want to delete this post?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="Delete">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
